@@ -8,6 +8,7 @@ var cors        = require('cors');
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
 var runner            = require('./test-runner');
+var helmet            = require('helmet');
 
 var app = express();
 
@@ -17,6 +18,9 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet.contentSecurityPolicy({
+  directives: { scriptSrc: ["'self'"], styleSrc: ["'self'"] }
+}));
 
 //Index page (static HTML)
 app.route('/')
@@ -30,12 +34,14 @@ fccTestingRoutes(app);
 //Routing for API 
 apiRoutes(app);  
     
+// comment out below as it is moved to routes/api.js file
 //404 Not Found Middleware
-app.use(function(req, res, next) {
+/*app.use(function(req, res, next) {
   res.status(404)
     .type('text')
     .send('Not Found');
 });
+*/
 
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {
